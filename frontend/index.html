@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Chat</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+  body { font-family: Arial; padding: 20px; }
+  #messages { border: 1px solid #ccc; height: 300px; overflow-y: scroll; margin-bottom: 10px; padding: 5px; }
+  input, button { padding: 5px; }
+</style>
+</head>
+<body>
+<h1>Mini Chat</h1>
+<input id="author" placeholder="Pseudo" />
+<div id="messages"></div>
+<input id="content" placeholder="Message" />
+<button onclick="sendMessage()">Envoyer</button>
+
+<script>
+const API_URL = 'https://<YOUR_BACKEND_URL>/api/messages'; // mettre l'URL Render ici
+
+async function fetchMessages() {
+  const res = await fetch(API_URL);
+  const messages = await res.json();
+  const messagesDiv = document.getElementById('messages');
+  messagesDiv.innerHTML = messages.map(m => `<b>${m.author}</b> [${m.time}]: ${m.content}`).join('<br>');
+}
+
+async function sendMessage() {
+  const author = document.getElementById('author').value;
+  const content = document.getElementById('content').value;
+  if (!author || !content) return alert("Pseudo et message requis");
+  await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ author, content })
+  });
+  document.getElementById('content').value = '';
+  fetchMessages();
+}
+
+setInterval(fetchMessages, 3000);
+fetchMessages();
+</script>
+</body>
+</html>
+
